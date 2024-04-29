@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.5.0/math.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vis-network/standalone/umd/vis-network.min.js"></script>
+       
+</head>
+<body>
+    <div class="container">
+        <div class="calculator dark">
+            <div class="theme-toggler active" onclick="toggleTheme()">
+                <i class="toggler-icon"></i>
+            </div>
+            <div class="display-screen">
+                <input type="text" name="expression" id="expression" placeholder="Enter expression" onkeydown="return allowOnlyCalculatorChars(event)" required>
+                <i class="fas fa-backspace" onclick="clearExpression()"></i>
+            </div>
+            <form id="calculator-form" action="/calculate" method="POST" onsubmit="saveExpression()">
+                <input type="hidden" name="expression" id="display">
+                <div class="buttons">
+                    <!-- Botones de la calculadora -->
+                    <div class="row">
+                        <button type="button" class="btn-operator" value="(" onclick="appendToExpression('(')"> ( </button>
+                        <button type="button" class="btn-operator" value=")" onclick="appendToExpression(')')"> ) </button>
+                        <button type="button" class="btn-operator" value="+" onclick="appendToExpression('+')"> + </button>
+                        <button type="button" class="btn-operator" value="-" onclick="appendToExpression('-')"> - </button>
+                    </div>
+                    <div class="row">
+                        <button type="button" class="btn-number" onclick="appendToExpression('7')">7</button>
+                        <button type="button" class="btn-number" onclick="appendToExpression('8')">8</button>
+                        <button type="button" class="btn-number" onclick="appendToExpression('9')">9</button>
+                        <button type="button" class="btn-operator" value="/" onclick="appendToExpression('/')"> / </button>
+                    </div>
+                    <div class="row">
+                        <button type="button" class="btn-number" onclick="appendToExpression('4')">4</button>
+                        <button type="button" class="btn-number" onclick="appendToExpression('5')">5</button>
+                        <button type="button" class="btn-number" onclick="appendToExpression('6')">6</button>
+                        <button type="button" class="btn-operator" value="*" onclick="appendToExpression('*')"> * </button>
+                    </div>
+                    <div class="row">
+                        <button type="button" class="btn-number" onclick="appendToExpression('1')">1</button>
+                        <button type="button" class="btn-number" onclick="appendToExpression('2')">2</button>
+                        <button type="button" class="btn-number" onclick="appendToExpression('3')">3</button>
+                        <button type="button" class="btn-operator" onclick="clearExpression()">C</button>
+                    </div>
+                    <div class="row">
+                        <button type="button" class="btn-operator" onclick="appendToExpression('0')">0</button>
+                        <button type="button" class="btn-operator" onclick="appendToExpression('.')">.</button>
+                        <button type="submit" class="calculate" colspan="4">Calculate</button>
+                    </div>
+                </div>
+            </form>
+        0</div>
+        
+        <div class="result">
+            {% if result is not none %}
+                <div class="result-box">
+                    <h3>Result</h3>
+                    <span>{{ result }}</span>
+                </div>
+            {% endif %}
+        </div>
+        
+        
+              
+        <div class="analysis-container">
+            <div class="analysis">
+                {% if components %}
+                    <table class="components-table">
+                        <tr>
+                            <th>Componente</th>
+                            <th>Tipo</th>
+                        </tr>
+                        {% for component, type in components %}
+                            <tr>
+                                <td>{{ component }}</td>
+                                <td>{{ type }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Contenedor para el árbol -->
+        <div class="tree-container" id="tree-container" style="display: none;">
+            <h3>Árbol Sintáctico:</h3>
+            <div id="mynetwork"></div>
+        </div>
+
+        <!-- Botón para mostrar el árbol -->
+        <button type="button" class="tree" onclick="showTree()">Tree</button>
+
+        <!-- Aquí puedes agregar más elementos según sea necesario -->
+    </div>
+
+    <script>
+        // Lógica JavaScript para la calculadora
+        function appendToExpression(value) {
+            document.getElementById("expression").value += value;
+            document.getElementById("display").value = document.getElementById("expression").value;
+        }
+
+        function clearExpression() {
+            document.getElementById("expression").value = "";
+            document.getElementById("display").value = "";
+        }
+
+        function allowOnlyCalculatorChars(event) {
+            var allowedChars = [
+                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                "+", "-", "*", "/", ".", "(", ")", "Backspace", "Delete"
+            ];
+            var key = event.key;
+            if (allowedChars.includes(key)) {
+                return true;
+            } else {
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        // ----------------------------------------------------------------------------------------------------
+
+        // Lógica JavaScript para mostrar el árbol sintáctico
+        function showTree() {
+            var treeDiv = document.querySelector(".tree-container");
+            treeDiv.style.display = "block";
+
+            // Obtener la expresión de la calculadora
+            var expression = document.getElementById("expression").value.trim();
+
+            // Verificar si se ingresó una expresión válida
+            if (expression === "") {
+                alert("Please enter an expression first.");
+                return;
+            }
+
+            // Generar el árbol sintáctico basado en la expresión ingresada
+            var treeData = generateTree(expression);
+
+            // Renderizar el árbol
+            renderTree(treeData);
+        }
+
+        // Generar el árbol sintáctico basado en la expresión ingresada
+        function generateTree(expression) {
+            // Esta es una implementación de ejemplo que simplemente muestra los nodos
+            // basados en los caracteres de la expresión. Debes reemplazar esto con tu lógica real.
+            var tree = math.parse(expression);
+            var nodes = [];
+            var edges = [];
+            var nodeCount = 1;
+
+            // Función recursiva para construir el árbol
+            function buildTree(node, parentId) {
+                if (node.isSymbolNode || node.isConstantNode) {
+                    nodes.push({ id: nodeCount, label: node.toString() });
+                    if (parentId !== undefined) {
+                        edges.push({ from: parentId, to: nodeCount });
+                    }
+                    nodeCount++;
+                } else {
+                    var newNodeId = nodeCount;
+                    nodes.push({ id: newNodeId, label: node.op || node.fn });
+                    if (parentId !== undefined) {
+                        edges.push({ from: parentId, to: newNodeId });
+                    }
+                    nodeCount++;
+                    for (var i = 0; i < node.args.length; i++) {
+                        buildTree(node.args[i], newNodeId);
+                    }
+                }
+            }
+
+            buildTree(tree, null);
+
+            return { nodes: nodes, edges: edges };
+        }
+
+        // Renderizar el árbol sintáctico
+        function renderTree(treeData) {
+            var container = document.getElementById('mynetwork');
+            var data = {
+                nodes: treeData.nodes,
+                edges: treeData.edges
+            };
+            var options = {
+                layout: {
+                    hierarchical: {
+                        direction: 'UD', // Arriba hacia abajo
+                        sortMethod: 'directed'
+                    }
+                },
+                nodes: {
+                    shape: 'circle', // Forma de los nodos
+                    size: 30, // Tamaño de los nodos
+                    font: {
+                        size: 18, // Tamaño de la fuente
+                        color: '#FFFFFF' // Color del texto
+                    },
+                    borderWidth: 2, // Ancho del borde
+                    color: {
+                        border: '#4CAF50', // Color del borde
+                        background: '#4CAF50' // Color de fondo
+                    }
+                },
+                edges: {
+                    color: '#ccc', // Color de los bordes
+                    width: 1 // Grosor de los bordes
+                }
+            };
+            var network = new vis.Network(container, data, options);
+
+            // Mostrar el contenedor del árbol
+            document.getElementById('tree-container').style.display = 'block';
+        }
+
+        // Guardar la expresión antes de calcular
+        function saveExpression() {
+            var expression = document.getElementById("expression").value.trim();
+            localStorage.setItem("currentExpression", expression);
+        }
+
+        // Recuperar la última expresión ingresada al cargar la página
+        window.onload = function() {
+            var expression = localStorage.getItem("currentExpression");
+            if (expression) {
+                document.getElementById("expression").value = expression;
+                document.getElementById("display").value = expression;
+            }
+        };
+
+        // Cambiar entre temas claro y oscuro
+        function toggleTheme() {
+            var calculator = document.querySelector('.calculator');
+            calculator.classList.toggle('dark');
+            var themeToggler = document.querySelector('.theme-toggler');
+            themeToggler.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
