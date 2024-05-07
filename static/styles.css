@@ -7,40 +7,37 @@
 }
 
 body {
-    font-family: sans-serif;
+    font-family: Arial, sans-serif;
     background-image: linear-gradient(to bottom right, rgba(79, 51, 176, 1.0), rgba(210, 53, 165));
+    color: #fff;
 }
 
 .container {
-    height: 100vh;
-    width: 100vw;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: -20px;
+    height: 100vh;
 }
 
 .calculator {
     position: relative;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 30px #000;
-    margin-right: auto;
-    margin-left: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    margin-left: auto; /* Mover la calculadora a la derecha */
+    background-color: rgba(255, 255, 255, 0.9);
+    max-width: 500px; /* Establecer el ancho máximo de la calculadora */
+    width: 334px; /* Hacer que la calculadora ocupe todo el ancho disponible */
+    margin: auto; /* Centrar la calculadora */
 }
 
 .theme-toggler {
     position: absolute;
-    top: 30px;
-    right: 30px;
-    color: #fff;
+    top: 50px;
+    right: 60px;
+    color: #333;
     cursor: pointer;
     z-index: 1;
-}
-
-.theme-toggler.active {
-    color: #333;
 }
 
 .theme-toggler.active::before {
@@ -53,32 +50,18 @@ body {
     width: 30px;
     position: absolute;
     top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 50%;
     background-color: #333;
     z-index: -1;
 }
 
-#display {
-    margin: 0 10px;
-    height: 60px; /* Ajuste de altura */
-    width: auto;
-    max-width: 270px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    font-size: 30px;
-    margin-bottom: 20px;
-    overflow-x: scroll;
-    background-color: #1aacd1;
-    color: #f8fafb;
-    border-radius: 5px;
-    padding: 10px;
-}
 
-#display::-webkit-scrollbar {
-    display: block;
-    height: 3px;
+
+#expression{
+    border-radius: 10px;
+
 }
 
 button {
@@ -89,7 +72,6 @@ button {
     margin: 5px;
     font-size: 20px;
     cursor: pointer;
-    transition: all 200ms ease;
 }
 
 button:hover {
@@ -140,52 +122,22 @@ button#equal {
     background-color: #357a38;
 }
 
-.components-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.components-table th, .components-table td {
-    padding: 8px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-.components-table th {
-    background-color: #f2f2f2;
-    color: #333;
-}
-
-.components-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.analysis-container {
-    text-align: left;
-}
-
-.analysis {
-    display: inline-block;
-    text-align: left;
-}
-
 .tree {
-    float: left; /* Cambiamos de right a left */
     margin-top: 20px;
-    margin-left: 20px; /* Añadimos margen a la izquierda */
+    margin-right: auto; /* Mover el árbol a la izquierda */
+    margin-left: 20px; /* Agregar un margen izquierdo al árbol */
+    float: left;
 }
-
 
 .result {
     margin-top: 20px;
 }
 
 .result-box {
-    background-color: #f3f4f6;
+    background-color: rgba(116, 50, 116, 0.267);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    width: 100%;
     max-width: 600px;
     margin: auto;
 }
@@ -198,16 +150,6 @@ button#equal {
     text-transform: capitalize;
 }
 
-#mynetwork {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    width: 800px; /* Ajustar el ancho del contenedor */
-    height: 500px; /* Ajustar el alto del contenedor */
-    margin: 0 auto;
-    border: 1px solid #070000;
-}
-
 .tree-container {
     display: inline-block;
     vertical-align: top;
@@ -217,4 +159,43 @@ button#equal {
     padding: 20px;
     margin-top: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 700px; /* Modifica el ancho máximo del cuadro del árbol */
+}
+
+/* display screen */
+.display-screen {
+    width: 75%;
+    height: 60px; /* Aumenta la altura para una mejor visualización */
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 1.5em;
+    text-align: right;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center; /* Centra verticalmente el contenido */
+}
+
+.display-screen input {
+    border: none;
+    background: none;
+    width: calc(100% - 40px); /* Ajusta el ancho del input */
+    outline: none;
+    font-size: 10px; /* Hereda el tamaño de fuente */
+}
+
+.display-screen input::placeholder {
+    color: #999;
+}
+
+.display-screen i {
+    margin-left: auto; /* Mueve el botón de borrar al extremo derecho */
+    cursor: pointer;
+    color: #666;
+}
+
+.display-screen i:hover {
+    color: #333;
 }

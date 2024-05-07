@@ -19,13 +19,14 @@ def calculate():
     return render_template('calculator.html', components=components, result=result, tree_data=json.dumps(tree_data))
 
 def analyze_expression(expression):
+    operators = {'+': 'Suma', '-': 'Resta', '*': 'Multiplicación', '/': 'División', '(': 'Paréntesis de apertura', ')': 'Paréntesis de cierre'}
     components = re.findall(r'\d+|[()+\-*/]', expression)
     analyzed_components = []
     for component in components:
         if component.isdigit():
             analyzed_components.append((component, 'Número'))
         else:
-            analyzed_components.append((component, 'Operador'))
+            analyzed_components.append((component, operators.get(component, 'Operador')))
     return analyzed_components
 
 def evaluate_expression(expression):

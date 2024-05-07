@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.5.0/math.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vis-network/standalone/umd/vis-network.min.js"></script>
-       
 </head>
 <body>
     <div class="container">
@@ -17,76 +16,79 @@
                 <i class="toggler-icon"></i>
             </div>
             <div class="display-screen">
-                <input type="text" name="expression" id="expression" placeholder="Enter expression" onkeydown="return allowOnlyCalculatorChars(event)" required>
-                <i class="fas fa-backspace" onclick="clearExpression()"></i>
+                <input type="text" name="expression" id="expression" class="expression-input" placeholder="Enter expression" oninput="fitText()" required>
+                <i class="fas fa-backspace" onclick="clearExpression2()"></i>
             </div>
-            <form id="calculator-form" action="/calculate" method="POST" onsubmit="saveExpression()">
-                <input type="hidden" name="expression" id="display">
-                <div class="buttons">
-                    <!-- Botones de la calculadora -->
-                    <div class="row">
-                        <button type="button" class="btn-operator" value="(" onclick="appendToExpression('(')"> ( </button>
-                        <button type="button" class="btn-operator" value=")" onclick="appendToExpression(')')"> ) </button>
-                        <button type="button" class="btn-operator" value="+" onclick="appendToExpression('+')"> + </button>
-                        <button type="button" class="btn-operator" value="-" onclick="appendToExpression('-')"> - </button>
-                    </div>
-                    <div class="row">
-                        <button type="button" class="btn-number" onclick="appendToExpression('7')">7</button>
-                        <button type="button" class="btn-number" onclick="appendToExpression('8')">8</button>
-                        <button type="button" class="btn-number" onclick="appendToExpression('9')">9</button>
-                        <button type="button" class="btn-operator" value="/" onclick="appendToExpression('/')"> / </button>
-                    </div>
-                    <div class="row">
-                        <button type="button" class="btn-number" onclick="appendToExpression('4')">4</button>
-                        <button type="button" class="btn-number" onclick="appendToExpression('5')">5</button>
-                        <button type="button" class="btn-number" onclick="appendToExpression('6')">6</button>
-                        <button type="button" class="btn-operator" value="*" onclick="appendToExpression('*')"> * </button>
-                    </div>
-                    <div class="row">
-                        <button type="button" class="btn-number" onclick="appendToExpression('1')">1</button>
-                        <button type="button" class="btn-number" onclick="appendToExpression('2')">2</button>
-                        <button type="button" class="btn-number" onclick="appendToExpression('3')">3</button>
-                        <button type="button" class="btn-operator" onclick="clearExpression()">C</button>
-                    </div>
-                    <div class="row">
-                        <button type="button" class="btn-operator" onclick="appendToExpression('0')">0</button>
-                        <button type="button" class="btn-operator" onclick="appendToExpression('.')">.</button>
-                        <button type="submit" class="calculate" colspan="4">Calculate</button>
-                    </div>
+            <div class="buttons">
+                <!-- Botones de la calculadora -->
+                <div class="row">
+                    <button type="button" class="btn-operator" value="(" onclick="appendToExpression('(')"> ( </button>
+                    <button type="button" class="btn-operator" value=")" onclick="appendToExpression(')')"> ) </button>
+                    <button type="button" class="btn-operator" value="+" onclick="appendToExpression('+')"> + </button>
+                    <button type="button" class="btn-operator" value="-" onclick="appendToExpression('-')"> - </button>
                 </div>
-            </form>
-        0</div>
-        
-        <div class="result">
-            {% if result is not none %}
-                <div class="result-box">
-                    <h3>Result</h3>
-                    <span>{{ result }}</span>
+                <div class="row">
+                    <button type="button" class="btn-number" onclick="appendToExpression('7')">7</button>
+                    <button type="button" class="btn-number" onclick="appendToExpression('8')">8</button>
+                    <button type="button" class="btn-number" onclick="appendToExpression('9')">9</button>
+                    <button type="button" class="btn-operator" value="/" onclick="appendToExpression('/')"> / </button>
                 </div>
-            {% endif %}
+                <div class="row">
+                    <button type="button" class="btn-number" onclick="appendToExpression('4')">4</button>
+                    <button type="button" class="btn-number" onclick="appendToExpression('5')">5</button>
+                    <button type="button" class="btn-number" onclick="appendToExpression('6')">6</button>
+                    <button type="button" class="btn-operator" value="*" onclick="appendToExpression('*')"> * </button>
+                </div>
+                <div class="row">
+                    <button type="button" class="btn-number" onclick="appendToExpression('1')">1</button>
+                    <button type="button" class="btn-number" onclick="appendToExpression('2')">2</button>
+                    <button type="button" class="btn-number" onclick="appendToExpression('3')">3</button>
+                    <button type="button" class="btn-operator" onclick="clearExpression()">C</button>
+                </div>
+                <div class="row">
+                    <button type="button" class="btn-operator" onclick="appendToExpression('0')">0</button>
+                    <button type="button" class="btn-operator" onclick="appendToExpression('.')">.</button>
+                    <button type="button" class="calculate" colspan="4" onclick="calculateExpression()">Calculate</button>
+                </div>
+            </div>
         </div>
         
-        
-              
-        <div class="analysis-container">
-            <div class="analysis">
-                {% if components %}
-                    <table class="components-table">
-                        <tr>
-                            <th>Componente</th>
-                            <th>Tipo</th>
-                        </tr>
-                        {% for component, type in components %}
-                            <tr>
-                                <td>{{ component }}</td>
-                                <td>{{ type }}</td>
-                            </tr>
-                        {% endfor %}
-                    </table>
+        <div class="result">
+            <div class="result-box" id="result-box">
+                <h3>Result</h3>
+                {% if result is not none %}
+                    <span>{{ result }}</span>
+                {% endif %}
+                {% if error %}
+                    <span style="color: red;">{{ error }}</span>
                 {% endif %}
             </div>
         </div>
         
+        <div class="analysis-container">
+            <div class="analysis">
+                <h3>Analysis</h3>
+                <div class="components-table">
+                    {% if components %}
+                        <table>
+                            <tr>
+                                <th>Component</th>
+                                <th>Type</th>
+                            </tr>
+                            {% for component, type in components %}
+                                <tr>
+                                    <td>{{ component }}</td>
+                                    <td>{{ type }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <p>No expression analyzed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div> 
+
         <!-- Contenedor para el árbol -->
         <div class="tree-container" id="tree-container" style="display: none;">
             <h3>Árbol Sintáctico:</h3>
@@ -103,12 +105,22 @@
         // Lógica JavaScript para la calculadora
         function appendToExpression(value) {
             document.getElementById("expression").value += value;
-            document.getElementById("display").value = document.getElementById("expression").value;
+            fitText();
         }
 
         function clearExpression() {
             document.getElementById("expression").value = "";
-            document.getElementById("display").value = "";
+            fitText();
+        }
+
+        function clearExpression2() {
+            var expression = document.getElementById("expression").value;
+            if (expression.length > 0) {
+                // Eliminar el último carácter de la expresión
+                expression = expression.substring(0, expression.length - 1);
+                document.getElementById("expression").value = expression;
+                fitText();
+            }
         }
 
         function allowOnlyCalculatorChars(event) {
@@ -125,19 +137,27 @@
             }
         }
 
+        // Ajustar el tamaño del texto en el display
+        function fitText() {
+            var input = document.getElementById("expression");
+            var valueLength = input.value.length;
+            var maxSize = 20;
+            var minSize = 8;
+            var size = maxSize - (valueLength * 0.5);
+            input.style.fontSize = Math.max(minSize, size) + "px";
+        }
+
         // ----------------------------------------------------------------------------------------------------
 
         // Lógica JavaScript para mostrar el árbol sintáctico
-        function showTree() {
-            var treeDiv = document.querySelector(".tree-container");
-            treeDiv.style.display = "block";
 
-            // Obtener la expresión de la calculadora
+        // Mostrar el árbol sintáctico
+        function showTree() {
             var expression = document.getElementById("expression").value.trim();
 
             // Verificar si se ingresó una expresión válida
             if (expression === "") {
-                alert("Please enter an expression first.");
+                showError("Please enter an expression first.");
                 return;
             }
 
@@ -150,46 +170,77 @@
 
         // Generar el árbol sintáctico basado en la expresión ingresada
         function generateTree(expression) {
-            // Esta es una implementación de ejemplo que simplemente muestra los nodos
-            // basados en los caracteres de la expresión. Debes reemplazar esto con tu lógica real.
-            var tree = math.parse(expression);
-            var nodes = [];
-            var edges = [];
-            var nodeCount = 1;
+            var operatorPrecedence = {
+                '+': 1,
+                '-': 1,
+                '*': 2,
+                '/': 2
+            };
 
-            // Función recursiva para construir el árbol
-            function buildTree(node, parentId) {
-                if (node.isSymbolNode || node.isConstantNode) {
-                    nodes.push({ id: nodeCount, label: node.toString() });
-                    if (parentId !== undefined) {
-                        edges.push({ from: parentId, to: nodeCount });
-                    }
-                    nodeCount++;
+            var output = [];
+            var stack = [];
+            var number = '';
+            for (var i = 0; i < expression.length; i++) {
+                var char = expression[i];
+                if (char === ' ') continue;
+
+                if (!isNaN(parseInt(char))) {
+                    number += char;
                 } else {
-                    var newNodeId = nodeCount;
-                    nodes.push({ id: newNodeId, label: node.op || node.fn });
-                    if (parentId !== undefined) {
-                        edges.push({ from: parentId, to: newNodeId });
+                    if (number !== '') {
+                        output.push(number);
+                        number = '';
                     }
-                    nodeCount++;
-                    for (var i = 0; i < node.args.length; i++) {
-                        buildTree(node.args[i], newNodeId);
+                    if (char === '(') {
+                        stack.push(char);
+                    } else if (char === ')') {
+                        while (stack.length && stack[stack.length - 1] !== '(') {
+                            output.push(stack.pop());
+                        }
+                        stack.pop();
+                    } else {
+                        while (stack.length && operatorPrecedence[char] <= operatorPrecedence[stack[stack.length - 1]]) {
+                            output.push(stack.pop());
+                        }
+                        stack.push(char);
                     }
                 }
             }
+            if (number !== '') {
+                output.push(number);
+            }
 
-            buildTree(tree, null);
+            while (stack.length) {
+                output.push(stack.pop());
+            }
 
-            return { nodes: nodes, edges: edges };
+            // Generar el árbol sintáctico
+            var root = {};
+            for (var i = 0; i < output.length; i++) {
+                var token = output[i];
+                if (!isNaN(parseInt(token))) {
+                    stack.push({ label: token });
+                } else {
+                    var right = stack.pop();
+                    var left = stack.pop();
+                    stack.push({ label: token, left: left, right: right });
+                }
+            }
+
+            root = stack.pop();
+            return root;
         }
 
         // Renderizar el árbol sintáctico
         function renderTree(treeData) {
             var container = document.getElementById('mynetwork');
             var data = {
-                nodes: treeData.nodes,
-                edges: treeData.edges
+                nodes: [],
+                edges: []
             };
+
+            addNodesAndEdges(treeData, null, data.nodes, data.edges);
+
             var options = {
                 layout: {
                     hierarchical: {
@@ -215,16 +266,54 @@
                     width: 1 // Grosor de los bordes
                 }
             };
+
             var network = new vis.Network(container, data, options);
 
             // Mostrar el contenedor del árbol
             document.getElementById('tree-container').style.display = 'block';
         }
 
+        function addNodesAndEdges(treeData, parentId, nodes, edges) {
+            if (!treeData) return;
+
+            var id = nodes.length + 1;
+
+            if (treeData.left && treeData.right) {
+                nodes.push({ id: id, label: treeData.label });
+                if (parentId) {
+                    edges.push({ from: parentId, to: id });
+                }
+
+                addNodesAndEdges(treeData.left, id, nodes, edges);
+                addNodesAndEdges(treeData.right, id, nodes, edges);
+            } else if (treeData.left) {
+                nodes.push({ id: id, label: treeData.label });
+                if (parentId) {
+                    edges.push({ from: parentId, to: id });
+                }
+
+                addNodesAndEdges(treeData.left, id, nodes, edges);
+            } else if (treeData.right) {
+                nodes.push({ id: id, label: treeData.label });
+                if (parentId) {
+                    edges.push({ from: parentId, to: id });
+                }
+
+                addNodesAndEdges(treeData.right, id, nodes, edges);
+            } else {
+                nodes.push({ id: id, label: treeData.label });
+                if (parentId) {
+                    edges.push({ from: parentId, to: id });
+                }
+            }
+        }
+
         // Guardar la expresión antes de calcular
         function saveExpression() {
             var expression = document.getElementById("expression").value.trim();
             localStorage.setItem("currentExpression", expression);
+            document.getElementById("display").value = expression;
+            return true;
         }
 
         // Recuperar la última expresión ingresada al cargar la página
@@ -233,16 +322,107 @@
             if (expression) {
                 document.getElementById("expression").value = expression;
                 document.getElementById("display").value = expression;
+                fitText();
             }
         };
 
         // Cambiar entre temas claro y oscuro
         function toggleTheme() {
-            var calculator = document.querySelector('.calculator');
-            calculator.classList.toggle('dark');
+            document.body.classList.toggle('dark-theme');
             var themeToggler = document.querySelector('.theme-toggler');
             themeToggler.classList.toggle('active');
         }
+
+        function showError(message) {
+            var resultBox = document.getElementById('result-box');
+            resultBox.innerHTML = `<h3>Error</h3><span style="color: red;">${message}</span>`;
+        }
+
+        // Validar la expresión antes de calcular
+        function calculateExpression() {
+            var expression = document.getElementById("expression").value.trim();
+            if (expression === "") {
+                showError("Ingresa una expresión valida primero");
+                return;
+            }
+            try {
+                var result = math.evaluate(expression);
+                document.getElementById("result-box").innerHTML = `<h3>Result</h3><span>${result}</span>`;
+                analyzeExpression(expression);
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Analizar la expresión
+        function analyzeExpression(expression) {
+            var components = [];
+            var operatorPrecedence = {
+                '+': 'Operador Suma',
+                '-': 'Operador Resta',
+                '*': 'Operador Multiplicacion',
+                '/': 'Operador Division',
+                '(': 'Parentesis Izquierdo',
+                ')': 'Parentesis derecho',
+                '.': 'punto'
+            };
+            var number = '';
+            for (var i = 0; i < expression.length; i++) {
+                var char = expression[i];
+                if (char === ' ') continue;
+
+                if (!isNaN(parseInt(char))) {
+                    number += char;
+                } else {
+                    if (number !== '') {
+                        components.push([number, 'Numero']);
+                        number = '';
+                    }
+                    components.push([char, operatorPrecedence[char]]);
+                }
+            }
+            if (number !== '') {
+                components.push([number, 'Numero']);
+            }
+
+            var result = document.querySelector('.components-table');
+            if (result) {
+                result.parentNode.removeChild(result);
+            }
+
+            // Crear una tabla de análisis
+            var table = document.createElement('table');
+            table.className = 'components-table';
+            var tr = document.createElement('tr');
+            var th1 = document.createElement('th');
+            th1.textContent = 'Component';
+            var th2 = document.createElement('th');
+            th2.textContent = 'Type';
+            tr.appendChild(th1);
+            tr.appendChild(th2);
+            table.appendChild(tr);
+            components.forEach(component => {
+                var tr = document.createElement('tr');
+                var td1 = document.createElement('td');
+                td1.textContent = component[0];
+                var td2 = document.createElement('td');
+                td2.textContent = component[1];
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                table.appendChild(tr);
+            });
+            document.querySelector('.analysis').appendChild(table);
+        }
     </script>
+    <script>
+        window.onload = function() {
+            var expressionInput = document.getElementById("expression");
+            var resultBox = document.getElementById("result-box");
+            expressionInput.value = "";
+            resultBox.innerHTML = "";
+        };
+    </script>
+   
+    
 </body>
 </html>
